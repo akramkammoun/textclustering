@@ -1,0 +1,84 @@
+extraction_concept <- function(sepSystem,resultatConceptsDir,sepFichier,decFichier,methodeTabName,methodeTabNbreTest,typeMethodeTabName,typeMethodeTabFichier,typeMethodeTabNbreMotMax
+	    ,typeMethodeTabNbreMotMin,typeMethodeTabMarge,fichierMots,nbreConceptsExpert)
+{
+  #execution
+  mots <- read.table(file=fichierMots,header=FALSE,sep="\t",quote="\"")#tjrs fixe
+  mots <- t(mots)#tjrs fixe
+
+  methodeTabLength <- length(methodeTabName)#tjrs fixe
+  typeMethodeTabLength <- length(typeMethodeTabName)#tjrs fixe
+
+  for(mehodeNum in 1:methodeTabLength)
+  {
+    methode <- methodeTabName[mehodeNum]
+    nbreTest <- methodeTabNbreTest[mehodeNum]
+
+    print(methode)
+
+    for(typeMethodeNum in 1:typeMethodeTabLength)
+    {
+      typeMethode <- typeMethodeTabName[typeMethodeNum]
+      nbreMotsTriee <- typeMethodeTabNbreMotMax[typeMethodeNum]
+      minNbreMot <- typeMethodeTabNbreMotMin[typeMethodeNum]
+
+      fichierImm <- typeMethodeTabFichier[typeMethodeNum]
+      imm <- read.table(file=fichierImm,header=TRUE,sep=sepFichier,quote="\"",dec=decFichier)    
+    
+      affTypeMethode = paste("___",typeMethode,sep="")
+      print(affTypeMethode)
+      
+      while (nbreMotsTriee >= minNbreMot)
+      {
+	#construction dossier
+	dirClasses_r <- paste(resultatConceptsDir,sepSystem,methode,sepSystem,"classes_r",sepSystem,typeMethode,sepSystem,nbreMotsTriee,"_mots",sepSystem,sep="")
+	dir.create(path=dirClasses_r, showWarnings = TRUE, recursive = TRUE, mode = "0777")
+
+	immUtile <- imm[,1:nbreMotsTriee]
+
+	for(i in 1:nbreTest)
+	{
+	  switch(methode,
+	    kmeans = 
+	    {
+	      methodeResultat <- kmeans(x=immUtile,nbreConceptsExpert,iter.max=500)
+	      methode_resultat_class <- methodeResultat$cluster
+	    },
+	    clara = 
+	    {
+	      methodeResultat <- clara(immUtile,nbreConceptsExpert)
+	      methode_resultat_class <- methodeResultat$clustering
+	    },
+	    mclust = 
+	    {
+	      #methodeResultat <- Mclust(data=immUtile,G=1:nbreConceptsExpert) 
+	      methodeResultat <- Mclust(data=immUtile) 	
+	      methode_resultat_class <- methodeResultat$classification
+	    },
+	    pam = 
+	    {
+	      methodeResultat <- pam(immUtile,nbreConceptsExpert) 
+	      methode_resultat_class <- methodeResultat$clustering
+	    },
+	    hclust =
+	    {
+	      methodeResultat <- hclust(dist(immUtile),"ave")
+	      methode_resultat_class <- cutree(methodeResultat, nbreConceptsExpert)
+	    }
+	  )
+
+	  x <- cbind(methode_resultat_class,mots[1,]) 
+
+	  #construction fichier
+	  fichier_out <- paste(dirClasses_r,methode,"_",typeMethode,"_",nbreMotsTriee,"_",i,"_classe_r.txt",sep="")
+
+	  write.table(x,row.names=FALSE,col.names=FALSE,quote = FALSE,file=fichier_out,sep=sepFichier,eol="\n")
+	  
+	}
+	marge <- typeMethodeTabMarge[typeMethodeNum]
+	nbreMotsTriee <- nbreMotsTriee - marge
+      }
+    }
+  }
+  print("=>extraction accomplie")
+  warnings()
+}#fin fonction

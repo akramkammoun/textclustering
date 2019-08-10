@@ -1,0 +1,44 @@
+#vider la mémoire
+rm(list=ls())
+
+setwd("/home/akram/pfe_acp/travail/resultat/extraction_concepts")
+
+library(package=stats)# pour kmeans
+library(package=cluster)# pour clara et pam
+library(package=mclust)# pour mclust
+
+source(file="/home/akram/pfe_acp/travail/r_workspace/fonction_extraction_concept.r")
+
+#configuration
+#
+
+sepSystem <- "/"# pour linux "/" et pour windows "\\"
+
+nomProjet <- "extract_imm_context"
+
+nbreConceptsExpert <- 13
+#pour fichier source
+sepFichier = "\t"
+decFichier = "."
+
+#methode utilisé
+methodeTabName <- c("kmeans", "clara", "mclust", "pam")
+methodeTabNbreTest <- c(5,1,1,1);
+
+#type methode utilisé
+#il faut que tout ces tableaux ont la meme dimension
+typeMethodeTabName <- c("context_cor_somme","context_cor_max","context_cor_inertie_somme","context_cor_inertie_max","context_axe_mot")#,"mot_axe"
+typeMethodeTabChemain <- c("outils/imm_context_77cp/imm_context_cor_somme.csv","outils/imm_context_77cp/imm_context_cor_max.csv","outils/imm_context_77cp/imm_context_cor_inertie_somme.csv",
+    "outils/imm_context_77cp/imm_context_cor_inertie_max.csv","outils/imm_context_77cp/imm_context_axe_mot.csv")#,"outils/imm_context_77cp/imm_context_mot_axe.csv"
+typeMethodeTabNbreMotMax <- c(267,267,267,267,228);
+typeMethodeTabNbreMotMin <- c(3,3,3,3,3);
+typeMethodeTabMarge <- c(3,3,3,3,3);
+
+#lecture les informations(mots)
+fichierMots = "outils/mots.csv"
+
+#
+#fin configuration
+
+extraction_concept(sepSystem,nomProjet,sepFichier,decFichier,methodeTabName,methodeTabNbreTest,typeMethodeTabName,typeMethodeTabChemain,typeMethodeTabNbreMotMax
+	    ,typeMethodeTabNbreMotMin,typeMethodeTabMarge,fichierMots,nbreConceptsExpert)

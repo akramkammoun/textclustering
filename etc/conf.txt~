@@ -1,0 +1,6 @@
+sep_os=/
+chemin_projet=/usr/local/apache2/htdocs/pfe
+cmd_r=/usr/bin/R
+cmd_rar=/usr/bin/rar
+cmd_supp=rm -r
+

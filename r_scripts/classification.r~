@@ -1,0 +1,12 @@
+
+sepFichier = "\t"
+decFichier = "."
+
+#
+#fin configuration
+
+
+library(package=mclust)# pour mclust
+
+extraction_concept(sepSystem,resultatConceptsDir,sepFichier,decFichier,methodeTabName,methodeTabNbreTest,typeMethodeTabName,typeMethodeTabFichier,typeMethodeTabNbreMotMax
+	    ,typeMethodeTabNbreMotMin,typeMethodeTabMarge,fichierMots,nbreConceptsExpert)
